@@ -87,7 +87,7 @@ namespace TanksServer.Model.Server
 
                 foreach (string item in ServerForm.listBox1.Items)
                 {
-                    if (client.Id.Equals(item.Substring(0, 36))
+                    if (client.Id.Equals(item.Substring(0, 36)))
                     {
                         ServerForm.listBox1.Items.Remove(item);
                         break;
