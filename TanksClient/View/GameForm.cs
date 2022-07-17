@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using TanksClient.Control;
 using TanksClient.Model;
@@ -29,17 +30,24 @@ namespace TanksClient
         //  Controls
         //
         public ButtonControl BControl = new ButtonControl();
-//        public TimerControl TControl = new TimerControl();
+        //        public TimerControl TControl = new TimerControl();
 
         //
         //  Another Features
         //
-        
+
         public static bool GameStarted = false;
+        public static bool GameEnded = false;
         public static Random Rand = new Random();
 
 
-
+        //
+        //  Timers
+        //
+        private System.Timers.Timer NetworkUpdater;
+        private System.Timers.Timer BulletsUpdater;
+        private System.Timers.Timer DeathChecker;
+        private System.Timers.Timer EndGameUpdater;
 
         public GameForm(string name)
         {
@@ -51,7 +59,7 @@ namespace TanksClient
             this.Paint += DrawBullets;
             this.KeyDown += BControl.MoveTank;
             this.KeyDown += BControl.SendBullet;
-
+            this.FormClosing += CloseTimers;
 
             //
             //  Form Settings
@@ -60,6 +68,7 @@ namespace TanksClient
             this.ClientSize = new Size(1000, 500);
             this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
             this.BackgroundImage = new Bitmap("GameBG.png");
+            this.Text = name;
 
             //
             //  Init
@@ -71,20 +80,46 @@ namespace TanksClient
             //
             //  Update
             //
-            System.Timers.Timer BulletsUpdater = new System.Timers.Timer();
-            BulletsUpdater.Elapsed += TimerControl.UpdateBullets;
-            BulletsUpdater.Interval = 200;
-            BulletsUpdater.Start();
+            this.BulletsUpdater = new System.Timers.Timer();
+            this.BulletsUpdater.Elapsed += TimerControl.UpdateBullets;
+            this.BulletsUpdater.Interval = 200;
+            this.BulletsUpdater.Start();
 
-            System.Timers.Timer DeathChecker = new System.Timers.Timer();
-            DeathChecker.Elapsed += TimerControl.DeathCheck;
-            DeathChecker.Interval = 300;
-            DeathChecker.Start();
+            this.DeathChecker = new System.Timers.Timer();
+            this.DeathChecker.Elapsed += TimerControl.DeathCheck;
+            this.DeathChecker.Interval = 300;
+            this.DeathChecker.Start();
 
-            System.Timers.Timer NetworkUpdater = new System.Timers.Timer();
-            NetworkUpdater.Elapsed += TimerControl.NetworkUpdate;
-            NetworkUpdater.Interval = 300;
-            NetworkUpdater.Start();
+            this.NetworkUpdater = new System.Timers.Timer();
+            this.NetworkUpdater.Elapsed += TimerControl.NetworkUpdate;
+            this.NetworkUpdater.Interval = 300;
+            this.NetworkUpdater.Start();
+
+            this.EndGameUpdater = new System.Timers.Timer();
+            this.EndGameUpdater.Elapsed += EndGameUpdate;
+            this.EndGameUpdater.Interval = 1000;
+            this.EndGameUpdater.Start();
+
+        }
+
+        private void EndGameUpdate(object sender, ElapsedEventArgs e)
+        {
+            if (GameEnded)
+            {
+                this.DeathChecker.Close();
+                this.NetworkUpdater.Close();
+                this.BulletsUpdater.Close();
+                this.EndGameUpdater.Close();
+                this.Close();
+                this.Dispose();
+            }
+        }
+
+        private void CloseTimers(object sender, FormClosingEventArgs e)
+        {
+            this.DeathChecker.Close();
+            this.NetworkUpdater.Close();
+            this.BulletsUpdater.Close();
         }
 
 

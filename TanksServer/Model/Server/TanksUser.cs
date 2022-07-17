@@ -22,59 +22,71 @@ namespace TanksServer.Model.Server
 
         public TanksUser(TcpClient tcpClient, TankServer TanksServer)
         {
-            Id = Guid.NewGuid().ToString();
-            _server = TanksServer;
+            this.Id = Guid.NewGuid().ToString();
+            this._server = TanksServer;
             this.tcpClient = tcpClient;
-            _server.AddConnection(this);
-
-
-            if (!Directory.Exists("UserStats"))
-            {
-                Directory.CreateDirectory("UserStats");
-            }
+                this.networkStream = tcpClient.GetStream();
+       //     this.Name = GetMsg();
+           // ServerForm.listBox1.Items.Add(this.Name);
+            this._server.AddConnection(this);
         }
 
         public void Work()
         {
             try
             {
-                networkStream = tcpClient.GetStream();
                 while (true)
                 {
-                    try
-                    {
-                        
-                        string json = GetMsg();
-                        if (json.StartsWith("cmd"))
+                    // if (networkStream.DataAvailable)
+                  //  {
+                        try
                         {
-                            string txt = json.Remove(0, 4);
-                            switch(txt){
-                                case "getStats":         
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            if (ServerForm.listBox1.Items.IndexOf(JsonSerializer.Deserialize<Tank>(json).Nickname) == -1)
-                            {
-                                this.Name = JsonSerializer.Deserialize<Tank>(json).Nickname;
-                                ServerForm.listBox1.Items.Add(this.Name);
-                            }
-                        _server.BroadcastMsg(GetMsg(), this.Id);
-                        }
-                        
-                        //File.WriteAllText("test.json", GetMsg());
-                       //Console.WriteLine($"{GetMsg()}\n\n");
 
-                    }
-                    catch (Exception ex)
-                    {
-                     
-                       Console.WriteLine(ex.Message);
-                       Console.WriteLine(ex.Message);
-                       Console.WriteLine(ex.Message);
-                        break;
-                    }
+                            string json = GetMsg();
+                            if (json.StartsWith("cmd"))
+                            {
+                                string txt = json.Remove(0, 4);
+                                switch (txt)
+                                {
+                                    case "getStats":
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                /* if (ServerForm.listBox1.Items == null)
+                                 {
+                                     this.Name = JsonSerializer.Deserialize<Tank>(json).Nickname;
+                                     ServerForm.listBox1.Items.Add(this.Name);
+                                 }
+                                 else
+                                 {*/
+
+                                if (json != String.Empty)
+                                {
+                                    _server.BroadcastMsg(json, this.Id);
+                                  /*  if (File.ReadAllText("Data\\activePlayers.txt").Split('\n').Any<string>((elem) => elem != JsonSerializer.Deserialize<Tank>(json).Nickname))
+                                    {
+                                        File.AppendAllText("Data\\activePlayers.txt", $"{JsonSerializer.Deserialize<Tank>(json).Nickname}\n");
+                                        this.Name = JsonSerializer.Deserialize<Tank>(json).Nickname;
+                                    }*/
+                                }
+                                //}
+                            }
+
+                            //File.WriteAllText("test.json", GetMsg());
+                            //Console.WriteLine($"{GetMsg()}\n\n");
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                            Console.WriteLine(ex.Message);
+                            //   Console.WriteLine(ex.Message);
+                            //   Console.WriteLine(ex.Message);
+                            break;
+                        }
+                   // }
                 }
             }
             catch (Exception ex)
@@ -93,11 +105,11 @@ namespace TanksServer.Model.Server
             byte[] data = new byte[2048];
             StringBuilder builder = new StringBuilder();
             int byteCount = 0;
-            do
+            while (networkStream.DataAvailable)
             {
                 byteCount = networkStream.Read(data, 0, data.Length);
                 builder.Append(Encoding.Unicode.GetString(data, 0, byteCount));
-            } while (networkStream.DataAvailable);
+            }
 
             return builder.ToString();
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -52,7 +53,10 @@ namespace TanksServer.Model.Server
             {
                 if (clients[i].Id != id)
                 {
-                    clients[i].networkStream.Write(data, 0, data.Length);
+                    if (clients[i].networkStream != null)
+                    {
+                        clients[i].networkStream.Write(data, 0, data.Length);
+                    }
                 }
             }
         }
@@ -72,14 +76,23 @@ namespace TanksServer.Model.Server
             }
         }
 
-        
+
         internal void DeleteConnetion(string id)
         {
             TanksUser client = clients.FirstOrDefault(x => x.Id.Equals(id));
             if (client != null)
             {
                 clients.Remove(client);
-                ServerForm.listBox1.Items.Remove(client.Name);
+
+
+                foreach (string item in ServerForm.listBox1.Items)
+                {
+                    if (client.Id.Equals(item.Substring(0, 36))
+                    {
+                        ServerForm.listBox1.Items.Remove(item);
+                        break;
+                    }
+                }
                 return;
             }
         }
@@ -87,6 +100,7 @@ namespace TanksServer.Model.Server
         internal void AddConnection(TanksUser TanksUser)
         {
             clients.Add(TanksUser);
+            ServerForm.listBox1.Items.Add($"{TanksUser.Id}");
         }
 
         internal void CloseServer()

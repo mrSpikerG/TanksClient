@@ -87,36 +87,37 @@ namespace TanksClient.Control
                 }
             });
         }
-        public TimerControl()
-        {
-           
-        }
+
         internal static void NetworkUpdate(object sender, ElapsedEventArgs e)
         {
-         //   if (GameForm.Tanks.Count<Tank>((tank) => tank.isAlive) == 1 && GameForm.Tanks.Count != 1) 
-         //   {
-         //       MainMenuForm.Money += 10;
-         //   }
             GameForm.GameStarted = true;
-                byte[] buffer = Encoding.Unicode.GetBytes(JsonSerializer.Serialize(GameForm.Tanks.FindLast(tank => tank.Nickname == GameForm.CurrentUser.Login)));
-                MainMenuForm.stream.Write(buffer, 0, buffer.Length);
-                receiveMsgThread = new Thread(ReceiveMsg);
-                receiveMsgThread.Start();
-            
-           /* else
-            {
-                if(GameForm.Tanks.Count != 1)
-                {
-                    File.AppendAllText("temp.txt", "1");
-                }
+            byte[] buffer = Encoding.Unicode.GetBytes(JsonSerializer.Serialize(GameForm.Tanks.FindLast(tank => tank.Nickname == GameForm.CurrentUser.Login)));
+            MainMenuForm.stream.Write(buffer, 0, buffer.Length);
+            receiveMsgThread = new Thread(ReceiveMsg);
+            receiveMsgThread.IsBackground = true;
+            receiveMsgThread.Start();
 
-            }*/
-          //      if(GameForm.Tanks.FindLast(tank => tank.Nickname == GameForm.CurrentUser.Login).isAlive)
-          //      {
-          //          
-          //      }
-          //  }
-            
+            if (GameForm.Tanks.Count != 1)
+            {
+                int deadPlayers = 0;
+                for (int i = 0; i < GameForm.Tanks.Count; i++)
+                {
+                    if (!GameForm.Tanks[i].isAlive)
+                    {
+                        deadPlayers++;
+                    }
+                }
+                if (deadPlayers == GameForm.Tanks.Count - 1)
+                {
+                    if (GameForm.Tanks.Find(tank => tank.Nickname == GameForm.CurrentUser.Login).isAlive)
+                    {
+                        MainMenuForm.Money += 10;
+                    }
+                    GameForm.GameEnded = true;
+                }
+            }
+
+
         }
 
         private static void ReceiveMsg()
@@ -153,7 +154,7 @@ namespace TanksClient.Control
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    
+
                 }
             }
 

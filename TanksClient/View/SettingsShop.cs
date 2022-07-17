@@ -24,7 +24,7 @@ namespace TanksClient.View
         private void button3_Click(object sender, EventArgs e)
         {
             //speed
-            if (MainMenuForm.Money >= 10 && MainMenuForm.Speed != 0)
+            if (MainMenuForm.Money >= 10 && MainMenuForm.Speed != 10)
             {
                 MainMenuForm.Money -= 10;
                 MainMenuForm.Speed += 1;
@@ -35,7 +35,7 @@ namespace TanksClient.View
         private void button2_Click(object sender, EventArgs e)
         {
             //dmg
-            if (MainMenuForm.Money >= 10 && MainMenuForm.Damage != 0)
+            if (MainMenuForm.Money >= 10 && MainMenuForm.Damage != 10)
             {
                 MainMenuForm.Money -= 10;
                 MainMenuForm.Damage += 1;
@@ -47,7 +47,7 @@ namespace TanksClient.View
         private void button1_Click(object sender, EventArgs e)
         {
             //hp
-            if (MainMenuForm.Money >= 10 && MainMenuForm.Health != 0)
+            if (MainMenuForm.Money >= 10 && MainMenuForm.Health != 10)
             {
                 MainMenuForm.Money -= 10;
                 MainMenuForm.Health += 1;

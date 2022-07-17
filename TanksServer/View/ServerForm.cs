@@ -9,17 +9,41 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
+using TanksServer.Control;
 
 namespace TanksServer
 {
     public partial class ServerForm : Form
     {      
         internal TankServer server;
+
+
+
+        //
+        //  Timers
+        //
+        private System.Timers.Timer ListBoxUpdater;
+
         public ServerForm()
         {
             InitializeComponent();
             this.FormClosing += CloseServer;
             server = new TankServer();
+
+
+            if (!Directory.Exists("UserStats"))
+            {
+                Directory.CreateDirectory("UserStats");
+            }
+            if (!Directory.Exists("Data"))
+            {
+                Directory.CreateDirectory("Data");
+            }
+           
+
+         
+
             try
             {
                 Thread thread = new Thread(new ThreadStart(server.Listen));

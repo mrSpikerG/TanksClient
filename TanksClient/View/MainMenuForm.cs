@@ -49,19 +49,15 @@ namespace TanksClient.View
             client.Connect(HOST, PORT);
             stream = client.GetStream();
 
-            //    byte[] buffer = Encoding.Unicode.GetBytes($"cmd getStats {Name}");
-            //    stream.Write(buffer, 0, buffer.Length);
-
-
 
             //
             //  Settings
             //
             this.BackgroundImage = new Bitmap("MainMenuBG.png");
             this.ClientSize = new Size(688, 520);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
             this.FormClosing += CloseNetwork;
-
+            
             //
             //  Textbox
             //
